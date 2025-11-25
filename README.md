@@ -33,11 +33,15 @@ Automated ETL (Extract, Transform, Load) pipeline for processing North Carolina 
    ├─> Normalize vendor names
    └─> Flatten nested structures
 
-6. LOAD (Database)
-   ├─> Create dynamic SQL tables
-   ├─> Sanitize column names
-   ├─> Type inference (NUMERIC, TEXT, JSONB)
-   └─> Insert into PostgreSQL RDS
+6. LOAD (Database) - Relational Schema
+   ├─> Analyze data structure (simple vs complex fields)
+   ├─> Create main table with simple fields
+   ├─> Create related tables for nested structures
+   │   ├─> Bid items tables (_table suffix)
+   │   ├─> Bid values tables (_bid_values suffix)
+   │   └─> Nested arrays tables (_bids suffix)
+   ├─> Maintain foreign key relationships (parent_id)
+   └─> Insert into PostgreSQL RDS with proper normalization
 
 7. ANALYSIS (Optional)
    ├─> Query all tables from RDS
@@ -128,6 +132,27 @@ Access at `http://localhost:5000`:
 - **Type Inference**: Automatically detects NUMERIC, TEXT, or JSONB columns
 - **Column Sanitization**: Removes special characters from SQL column names
 - **Error Handling**: Continues batch processing even if individual files fail
+- **Relational Normalization**: Automatically creates related tables for nested structures
+
+### 5. Intelligent Database Schema
+The system automatically detects complex nested structures and creates properly normalized relational tables:
+
+**Simple Documents** (e.g., Award Letters):
+- Single table with all fields
+- Direct column mapping
+
+**Complex Documents** (e.g., Bid Tabs):
+- **Main table**: Header information (contract ID, date, description)
+- **Related tables**: Automatically created for nested data
+  - `{table_name}_table`: Line items with quantities and prices
+  - `{table_name}_bids`: Individual bid submissions
+  - `{table_name}_bid_values`: Vendor pricing arrays
+
+**Benefits**:
+- ✅ Proper data normalization
+- ✅ Easy SQL queries with JOINs
+- ✅ Maintains referential integrity via foreign keys
+- ✅ Scalable for large datasets
 
 ## Setup
 
@@ -202,6 +227,8 @@ python src/Analysis/generate_report.py
 
 ## Data Flow Example
 
+### Example 1: Simple Document (Award Letter)
+
 **Input PDF**: `DA00564_Award_Letter.pdf`
 
 **Extracted Data**:
@@ -215,19 +242,111 @@ python src/Analysis/generate_report.py
 }
 ```
 
-**Database Table**: `DA00564_Award_Letter`
+**Database Schema** - Single Table:
 ```sql
 CREATE TABLE "DA00564_Award_Letter" (
   id SERIAL PRIMARY KEY,
-  tipo TEXT,
-  arquivo_origem TEXT,
-  criado_em TIMESTAMP DEFAULT NOW(),
+  document_type TEXT,
+  source_file TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
   "contract_number" TEXT,
   "award_date" TEXT,
   "vendor_name" TEXT,
   "contract_amount" NUMERIC,
   "project_description" TEXT
 );
+```
+
+### Example 2: Complex Document (Bid Tabs)
+
+**Input PDF**: `DA00653_Bid_Tabs.pdf`
+
+**Extracted Data**:
+```json
+{
+  "contract_id": "DA00653",
+  "letting_date": "09/29/2025",
+  "vendor_names": ["RILEY PAVING INC", "WHITEHURST PAVING CO INC"],
+  "table": {
+    "item_line_number": [1, 2, 3],
+    "item_description": ["MOBILIZATION", "AST DOUBLE SEAL", "EMULSION"],
+    "item_quantity": [1, 380471, 232657],
+    "vendor_1_unit_price": [101000.00, 1.76, 2.50],
+    "vendor_2_unit_price": [112000.00, 1.71, 2.44]
+  },
+  "bid_values": [
+    {"vendor": "RILEY PAVING INC", "bid_value": 1387101.46, "rank": 1},
+    {"vendor": "WHITEHURST PAVING CO INC", "bid_value": 1414798.49, "rank": 2}
+  ]
+}
+```
+
+**Database Schema** - Normalized Relational Tables:
+
+**Main Table**:
+```sql
+CREATE TABLE "DA00653_Bid_Tabs" (
+  id SERIAL PRIMARY KEY,
+  document_type TEXT,
+  source_file TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  "contract_id" TEXT,
+  "letting_date" TEXT,
+  "vendor_names" JSONB  -- Simple array kept as JSONB
+);
+```
+
+**Related Table 1** - Item Breakdown:
+```sql
+CREATE TABLE "DA00653_Bid_Tabs_table" (
+  id SERIAL PRIMARY KEY,
+  da00653_bid_tabs_id INTEGER NOT NULL,  -- Foreign key
+  row_index INTEGER,
+  "item_line_number" NUMERIC,
+  "item_description" TEXT,
+  "item_quantity" NUMERIC,
+  "vendor_1_unit_price" NUMERIC,
+  "vendor_2_unit_price" NUMERIC
+);
+```
+
+**Related Table 2** - Bid Values:
+```sql
+CREATE TABLE "DA00653_Bid_Tabs_bid_values" (
+  id SERIAL PRIMARY KEY,
+  da00653_bid_tabs_id INTEGER NOT NULL,  -- Foreign key
+  array_index INTEGER,
+  "vendor" TEXT,
+  "bid_value" NUMERIC,
+  "rank" NUMERIC
+);
+```
+
+**Querying Related Data**:
+```sql
+-- Get all line items for a specific bid
+SELECT 
+  main.contract_id,
+  main.letting_date,
+  items.item_description,
+  items.item_quantity,
+  items.vendor_1_unit_price
+FROM "DA00653_Bid_Tabs" main
+JOIN "DA00653_Bid_Tabs_table" items 
+  ON items.da00653_bid_tabs_id = main.id
+WHERE main.id = 1
+ORDER BY items.row_index;
+
+-- Get winning bid information
+SELECT 
+  main.contract_id,
+  bids.vendor,
+  bids.bid_value,
+  bids.rank
+FROM "DA00653_Bid_Tabs" main
+JOIN "DA00653_Bid_Tabs_bid_values" bids 
+  ON bids.da00653_bid_tabs_id = main.id
+WHERE bids.rank = 1;
 ```
 
 ## API Endpoints
