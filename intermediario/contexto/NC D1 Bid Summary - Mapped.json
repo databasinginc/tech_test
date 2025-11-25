@@ -1,0 +1,40 @@
+{
+  "Letting Date": "09/17/2025",
+  "State and Owner": "NCDOT-DIVISIONS Bid Summary Report",
+  "Bids": [
+    {
+      "Call Number": "001",
+      "Contract ID": "DA00652",
+      "Proposal Project Type": "RESURFACING, SHOULDER RECONSTRUCTION, PAVEMENT MARKINGS",
+      "Bid Value": {
+        "bid_amounts": [
+          "$2,218,812.00",
+          "$2,224,166.18",
+          "$2,309,596.88"
+        ],
+        "vendor_names": [
+          "FSC II LLC DBA FRED SMITH COMPANY",
+          "C D ROSE CONSTRUCTION LLC",
+          "BARNHILL CONTRACTING CO"
+        ]
+      },
+      "Owner Cost Estimate": "$2,597,236.74"
+    },
+    {
+      "Call Number": "002",
+      "Contract ID": "DA00653",
+      "Proposal Project Type": "ASPHALT SURFACE TREATMENT (DOUBLE SEAL)",
+      "Bid Value": {
+        "bid_amounts": [
+          "$1,387,101.46",
+          "$1,414,798.49"
+        ],
+        "vendor_names": [
+          "RILEY PAVING INC",
+          "WHITEHURST PAVING CO INC"
+        ]
+      },
+      "Owner Cost Estimate": "$1,344,961.10"
+    }
+  ]
+}

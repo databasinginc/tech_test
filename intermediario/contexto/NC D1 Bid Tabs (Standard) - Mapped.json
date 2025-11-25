@@ -1,0 +1,99 @@
+{
+  "County": "BERTIE, HERTFORD, HYDE, NORTHAMPTON, TYRRELL",
+  "Project Number": [
+    "2026CPT.01.02.20082",
+    "2026CPT.01.02.20462",
+    "2026CPT.01.02.20482",
+    "2026CPT.01.02.20662",
+    "2026CPT.01.02.20892"
+  ],
+  "Proposal Project Type": "ASPHALT SURFACE TREATMENT (DOUBLE SEAL)",
+  "Location": "11 SECTION OF SECONDARY ROADS",
+  "Contract ID": "DA00653",
+  "TIP No.": null,
+  "FED AID NO": null,
+  "Letting Date": "09/29/2025",
+  "Call Number": "002",
+  "Vendor Names": [
+    "RILEY PAVING INC",
+    "WHITEHURST PAVING CO INC"
+  ],
+  "Table": {
+    "Item Line Number": [
+      1, 2, 3, 4, 5
+    ],
+    "Item Number": [
+      "0000100000-N 800",
+      "1803500000-E 660",
+      "1838000000-E 660",
+      "4413000000-E SP",
+      "4457000000-N SP"
+    ],
+    "Item Description": [
+      "MOBILIZATION",
+      "AST, DOUBLE SEAL",
+      "EMULSION FOR AST",
+      "WORK ZONE ADV/GEN WARN SIGN",
+      "TEMP TRAFFIC CONTROL (SP)"
+    ],
+    "Item Quantity": [
+      1,
+      380471,
+      232657,
+      890,
+      1
+    ],
+    "Item Unit": [
+      "Lump Sum",
+      "SY",
+      "GAL",
+      "SF",
+      "Lump Sum"
+    ],
+    "Vendor 1 Unit Price": [
+      101000.00,
+      1.76,
+      2.50,
+      7.00,
+      28600.00
+    ],
+    "Vendor 1 Extended Price": [
+      101000.00,
+      669628.96,
+      581642.50,
+      6230.00,
+      28600.00
+    ],
+    "Vendor 2 Unit Price": [
+      112000.00,
+      1.71,
+      2.44,
+      9.00,
+      76500.00
+    ],
+    "Vendor 2 Extended Price": [
+      112000.00,
+      650605.41,
+      567683.08,
+      8010.00,
+      76500.00
+    ]
+  },
+  "Total Vendor 1": 1387101.46,
+  "Total Vendor 2": 1414798.49,
+  "Bid Values": [
+    {
+      "Vendor": "RILEY PAVING INC",
+      "Bid Value": 1387101.46,
+      "Rank": 1
+    },
+    {
+      "Vendor": "WHITEHURST PAVING CO INC",
+      "Bid Value": 1414798.49,
+      "Rank": 2
+    }
+  ],
+  "Miles": 29.996,
+  "Funding": "STATE FUNDED",
+  "Timestamp": "2025-09-29T08:47:04-0700"
+}
